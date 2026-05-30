@@ -355,14 +355,17 @@ Be thorough, specific, and use actual data from the signals where available."""
         if addressed == len(collected_results["objection_responses"]) and len(collected_results["objection_responses"]) > 0:
             score += 10
 
+    result = JustificationResult(
+        roi_model=collected_results["roi_model"],
+        exec_summary=collected_results["exec_summary"],
+        exec_summary_headline_metrics=collected_results["exec_summary_headline_metrics"],
+        procurement_doc=collected_results["procurement_doc"],
+        objection_responses=collected_results["objection_responses"],
+        completeness_score=min(score, 100)
+    )
+
     yield {
         "type": "complete",
-        "result": JustificationResult(
-            roi_model=collected_results["roi_model"],
-            exec_summary=collected_results["exec_summary"],
-            exec_summary_headline_metrics=collected_results["exec_summary_headline_metrics"],
-            procurement_doc=collected_results["procurement_doc"],
-            objection_responses=collected_results["objection_responses"],
-            completeness_score=min(score, 100)
-        )
+        "result": result.model_dump(),  # Serialize to dict for JSON streaming
+        "_result_obj": result  # Keep Python object for router to use
     }
